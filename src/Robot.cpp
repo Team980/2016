@@ -1,10 +1,15 @@
 #include "WPILib.h"
 
+#include "CameraSystem.cpp"
+
 class Robot: public IterativeRobot
 {
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
 	LiveWindow *lw;
+
+	CameraSystem cameraSystem;
+
 	int autoLoopCounter;
 
 public:
@@ -41,7 +46,7 @@ private:
 
 	void TeleopInit()
 	{
-
+		cameraSystem.Scan();
 	}
 
 	void TeleopPeriodic()
