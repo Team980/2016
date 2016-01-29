@@ -17,6 +17,9 @@ public:
 		myRobot(8, 9),	// these must be initialized in the same order
 		stick(0),		// as they are declared above.
 		lw(LiveWindow::GetInstance()),
+
+		cameraSystem(),
+
 		autoLoopCounter(0)
 	{
 		myRobot.SetExpiration(0.1);

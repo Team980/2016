@@ -24,7 +24,7 @@ class CameraSystem {
 
 public:
 	CameraSystem() {
-		camera = new AxisCamera("10.9.80.20");
+		camera = new AxisCamera("axis-camera.local");
 
 		twoTanTheta = 2.0*tan(VIEW_ANGLE*PI/(180.0*2.0));
 	}
@@ -32,10 +32,8 @@ public:
 	void Scan()
 	{
 		int ret;
-		Threshold threshold(0, 255, 50, 255, 70, 255);
 		ParticleFilterCriteria2 criteria[] = {{IMAQ_MT_AREA, AREA_MINIMUM, 65535, false, false}};
-		char myString[64];
-		Range hueRange;  //, saturationRange, luminanceRange;
+		Range *hueRange, *saturationRange;//, luminanceRange;
 		int numParticles, i;
 		ParticleAnalysisReport report;
 		ParticleFilterOptions  particleFilterOpt;
@@ -43,8 +41,7 @@ public:
 		int dispField;
 		double distance[2];
 
-		sprintf(myString, "starting vision\n");
-		SmartDashboard::PutString("DB/String 0", myString);
+		printf("Starting Vision...\n");
 
 		Image *inputImage = frcCreateImage(IMAQ_IMAGE_RGB);
 		Image *thresholdImage = frcCreateImage(IMAQ_IMAGE_U8);
@@ -53,50 +50,46 @@ public:
 		ret = camera->GetImage(inputImage);
 		if (!ret)
 		{
-			sprintf(myString, "problem getting image\n");
-			SmartDashboard::PutString("DB/String 1", myString);
+			printf("problem getting image\n");
 		}
 		else
 		{
-			sprintf(myString, "Got image\n");
-			SmartDashboard::PutString("DB/String 1", myString);
+			printf("Got image\n");
 		}
 
 		ret = frcWriteImage (inputImage, "/home/lvuser/raw.png");
 
 		if (!ret)
 		{
-			sprintf(myString, "PROBLEM writing file\n");
-			sprintf(myString,GetVisionErrorText(GetLastVisionError()));
-			SmartDashboard::PutString("DB/String 2", myString);
+			printf("PROBLEM writing file\n");
+			printf(GetVisionErrorText(GetLastVisionError()));
 		}
 		else
 		{
-			sprintf(myString, "wrote image\n");
-			SmartDashboard::PutString("DB/String 2", myString);
+			printf("Wrote image: raw.png\n");
 		}
-		// values needed to discriminate the GREEN REFLECTIVE TAPE
-		// these values are probably wrong but no harm in trying...
-		hueRange.minValue = 80;
-		hueRange.maxValue = 120;
-		//	saturationRange.minValue = 135;
-		//	saturationRange.maxValue = 165;
-		//	luminanceRange.minValue = 120;
-		//	luminanceRange.maxValue = 150;
+		// values needed to discriminate the GREEN REFLECTIVE TAPE - TODO Make these work
+		hueRange = new Range();
+		saturationRange = new Range();
+		//luminanceRange = new Range();
 
-		sprintf(myString, "threshold\n");
-		SmartDashboard::PutString("DB/String 0", myString);
+		hueRange->minValue = 150;
+		hueRange->maxValue = 170;
+		saturationRange->minValue = 80;
+		saturationRange->maxValue = 100;
+		//luminanceRange.minValue = 70;//120;
+		//luminanceRange.maxValue = 255;//150;
 
-		ret = frcHueThreshold(thresholdImage, inputImage, &hueRange);
+		printf("Thresholding...\n");
+
+		ret = frcColorThreshold(thresholdImage, inputImage, 170, IMAQ_HSL, hueRange, saturationRange, nullptr); //TODO make this work
 		if (!ret)
 		{
-			sprintf(myString, "problem thresholding image\n");
-			SmartDashboard::PutString("DB/String 3", myString);
+			printf("Problem thresholding image\n");
 		}
 		else
 		{
-			sprintf(myString, "t-holding image complete\n");
-			SmartDashboard::PutString("DB/String 3", myString);
+			printf("Thresholding image complete\n");
 		}
 
 		frcWriteImage (thresholdImage, "/home/lvuser/threshold.png");
@@ -108,13 +101,11 @@ public:
 				&particleFilterOpt, &numParticles);
 		if (!ret)
 		{
-			sprintf(myString, "problem with particle filter\n");
-			SmartDashboard::PutString("DB/String 4", myString);
+			printf("problem with particle filter\n");
 		}
 		else
 		{
-			sprintf(myString, "particle fltr complete %d\n", numParticles);
-			SmartDashboard::PutString("DB/String 4", myString);
+			printf("particle fltr complete %d\n", numParticles);
 		}
 
 		frcWriteImage (particleImage, "/home/lvuser/Filtered.png");
@@ -125,26 +116,21 @@ public:
 			ret = frcParticleAnalysis(particleImage, i, &report);
 			if (!ret)
 			{
-				sprintf(myString, "prbm w/part.analysis %d\n", i);
-				SmartDashboard::PutString("DB/String 5", myString);
+				printf("prbm w/part.analysis %d\n", i);
 			}
 
-			if ((report.particleArea > AREA_MINIMUM) && (report.particleArea < AREA_MAXIMUM))
+			if ((report.particleArea > AREA_MINIMUM) && (report.particleArea < AREA_MAXIMUM)) //TODO change this
 			{
-				sprintf(myString, "CM:%d, %d\n", report.center_mass_x, report.center_mass_y);
-				SmartDashboard::PutString("DB/String 6", myString);
-				sprintf(myString, "BB:%d, %d / %d, %d\n", report.boundingRect.top, report.boundingRect.left,
+				printf("CM:%d, %d\n", report.center_mass_x, report.center_mass_y);
+				printf("BB:%d, %d / %d, %d\n", report.boundingRect.top, report.boundingRect.left,
 						report.boundingRect.width, report.boundingRect.height);
-				SmartDashboard::PutString("DB/String 7", myString);
 				if (dispField < 2)
 					distance[dispField] = computeDistance(&report);
 				dispField++;
 			}
 		}
-		sprintf(myString, "dist: %lf %lf", distance[0], distance[1]);
-		SmartDashboard::PutString("DB/String 8", myString);
-		sprintf(myString, "dispField: %d", dispField);
-		SmartDashboard::PutString("DB/String 9", myString);
+		printf("dist: %lf %lf", distance[0], distance[1]);
+		printf("dispField: %d", dispField);
 	}
 
 private:
