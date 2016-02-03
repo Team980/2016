@@ -4,13 +4,13 @@
 
 class Robot: public IterativeRobot
 {
+private:
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
 	LiveWindow *lw;
 
 	CameraSystem cameraSystem; //Camera system
 
-private:
 	void RobotInit() {
 
 	}
