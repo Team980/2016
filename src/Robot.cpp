@@ -8,20 +8,50 @@ class Robot: public IterativeRobot
 	Joystick stick; // only joystick
 	LiveWindow *lw;
 
-	CameraSystem cameraSystem;
+	CameraSystem cameraSystem; //Camera system
 
-	int autoLoopCounter;
+private:
+	void RobotInit() {
+
+	}
+
+	void AutonomousInit()
+	{
+
+	}
+
+	void AutonomousPeriodic()
+	{
+
+	}
+
+	void TeleopInit()
+	{
+
+	}
+
+	void TeleopPeriodic()
+	{
+		//Use Z axis (twist) for rotation
+		myRobot.ArcadeDrive(stick, 1, stick, 2, true); // drive with arcade style (use right stick)
+
+		cameraSystem.Scan();
+	}
+
+	void TestPeriodic()
+	{
+		lw->Run();
+	}
 
 public:
-	Robot() :
-		myRobot(8, 9),	// these must be initialized in the same order
-		stick(0),		// as they are declared above.
-		lw(LiveWindow::GetInstance()),
-
-		cameraSystem(),
-
-		autoLoopCounter(0)
+	Robot()
 	{
+		myRobot = new RobotDrive(8,9);
+		stick = new Joystick(0);
+		lw = new LiveWindow(LiveWindow::GetInstance());
+
+		cameraSystem = new CameraSystem();
+
 		myRobot.SetExpiration(0.1);
 
 		//The robot was wired backwards
@@ -30,38 +60,15 @@ public:
 		myRobot.SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 	}
 
-private:
-	void AutonomousInit()
+	~Robot ()
 	{
-		autoLoopCounter = 0;
+		~myRobot();
+		~stick();
+		~lw();
+
+		~cameraSystem();
 	}
 
-	void AutonomousPeriodic()
-	{
-		if(autoLoopCounter < 100) //Check if we've completed 100 loops (approximately 2 seconds)
-		{
-			myRobot.Drive(-0.5, 0.0); 	// drive forwards half speed
-			autoLoopCounter++;
-			} else {
-			myRobot.Drive(0.0, 0.0); 	// stop robot
-		}
-	}
-
-	void TeleopInit()
-	{
-		cameraSystem.Scan();
-	}
-
-	void TeleopPeriodic()
-	{
-		//Use Z axis (twist) for rotation
-		myRobot.ArcadeDrive(stick, 1, stick, 2, true); // drive with arcade style (use right stick)
-	}
-
-	void TestPeriodic()
-	{
-		lw->Run();
-	}
 };
 
 START_ROBOT_CLASS(Robot)

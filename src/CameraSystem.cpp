@@ -4,6 +4,9 @@
  *  Created on: Jan 26, 2016
  *      Author: Luke
  */
+#include <unistd.h>
+#include <stdio.h>
+
 #include "WPILib.h"
 #include "Constants.h"
 
@@ -19,17 +22,26 @@
 
 class CameraSystem {
 
-	AxisCamera *camera;
 	double twoTanTheta;
 
 public:
 	CameraSystem() {
-		camera = new AxisCamera("axis-camera.local");
-
 		twoTanTheta = 2.0*tan(VIEW_ANGLE*PI/(180.0*2.0));
 	}
 
-	void Scan()
+	/* Requires GRIP to be running in order for this to do anything! */
+	void Scan() {
+		auto grip = NetworkTable::GetTable("grip");
+
+		auto areas = grip->GetNumberArray("targets/area", llvm::ArrayRef<double>());
+
+		for (auto area : areas) {
+			std::cout << "Got contour with area=" << area << std::endl;
+		}
+	}
+
+	//Legacy code. Not recommended for use
+	/*void Scan()
 	{
 		int ret;
 		ParticleFilterCriteria2 criteria[] = {{IMAQ_MT_AREA, AREA_MINIMUM, 65535, false, false}};
@@ -131,7 +143,7 @@ public:
 		}
 		printf("dist: %lf %lf", distance[0], distance[1]);
 		printf("dispField: %d", dispField);
-	}
+	}*/
 
 private:
 	double computeDistance (ParticleAnalysisReport *report)
