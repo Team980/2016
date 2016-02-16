@@ -2,18 +2,25 @@
 #include "Parameters.h"
 #include "Constants.h"
 
-//defines go here
-
 class Robot: public IterativeRobot
 {
 private:
 	// declarations
-	CanTalonSRX *m_motor;
-	Joystick *stick;
-	DigitalInput *limitSwitch;
+	RobotDrive *myRobot; // robot drive system
+	Joystick *driveStick;
 	
+	Joystick *controlStick;
+	CANTalon *rollerMotor;
+
+	//same joystick as the roller
+	AnalogInput *armPot;
+	CANTalon *armMotor;
+	PIDController *armPid;
+
 	void RobotInit()
 	{
+		armPid->SetSetpoint(armUpPosition);
+		armPid->Enable();
 	}
 
 	void AutonomousInit()
@@ -30,19 +37,35 @@ private:
 
 	void TeleopPeriodic()
 	{
-		float stickVal;
+		//drive
+		myRobot->ArcadeDrive(driveStick, Joystick::kYAxis, driveStick, Joystick::kZAxis, true);
 
-
-		stickVal = stick->GetY();
-
-		if (limitSwitch->Get()== false and stickVal < 0)
+		//roller
+		if (controlStick ->GetRawButton(rollerIn))
 		{
-
-			m_motor->Set(0);
+			rollerMotor ->Set(rollerInSpeed);
 		}
-		else
+		else if (controlStick ->GetRawButton(rollerStop))
 		{
-			m_motor->Set(stickVal);
+			rollerMotor ->Set(rollerStopSpeed);
+		}
+		else if (controlStick ->GetRawButton(rollerOut))
+		{
+			rollerMotor ->Set(rollerOutSpeed);
+		}
+
+		//arm
+		if (controlStick ->GetRawButton(armDown))
+		{
+			armPid->SetSetpoint(armDownPosition);
+		}
+		else if (controlStick ->GetRawButton(armFlat))
+		{
+			armPid->SetSetpoint(armFlatPosition);
+		}
+		else if (controlStick ->GetRawButton(armUp))
+		{
+			armPid->SetSetpoint(armUpPosition);
 		}
 	}
 
@@ -53,17 +76,35 @@ private:
 public:
 	Robot()
 	{
-		m_motor = new CanTalonSRX(13);
-		stick = new Joystick(0);
-		limitSwitch = new DigitalInput(1);
+		myRobot = new RobotDrive(leftSideMotorsCh,rightSideMotorsCh); //Constructor defaults to rear when using two drives
+		myRobot->SetExpiration(0.1);
+		myRobot->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+		myRobot->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
+		
+		driveStick = new Joystick(driveJsCh);
 
+		controlStick = new Joystick(controlJsCh);
+
+		rollerMotor = new CANTalon(rollerMotorId);
+
+		armPot = new AnalogInput(potCh);
+
+		armMotor = new CANTalon(armMotorId);
+
+		armPid = new PIDController(potP, potI, potD, armPot, armMotor);
+		armPid->SetInputRange(potMinVolt, potMaxVolt);
+		armPid ->SetTolerance(potTol);
 	}
 
 	~Robot()
 	{
-		delete m_motor;
-		delete stick;
-		delete limitSwitch;
+		delete myRobot;
+		delete driveStick;
+		delete controlStick;
+		delete rollerMotor;
+		delete armPot;
+		delete armMotor;
+		delete armPid;
 	}
 };
 
