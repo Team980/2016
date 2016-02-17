@@ -8,6 +8,10 @@ private:
 	// declarations
 	RobotDrive *myRobot; // robot drive system
 	Joystick *driveStick;
+	Encoder *leftDriveEnc;
+	Encoder *rightDriveEnc;
+	PIDController *leftDrivePid;
+	PIDController *rightDrivePid;
 	
 	Joystick *controlStick;
 	CANTalon *rollerMotor;
@@ -19,6 +23,10 @@ private:
 
 	void RobotInit()
 	{
+		//leftDrivePid->Enable();
+
+		//rightDrivePid->Enable();
+
 		armPid->SetSetpoint(armUpPosition);
 		armPid->Enable();
 	}
@@ -83,6 +91,20 @@ public:
 		
 		driveStick = new Joystick(driveJsCh);
 
+		leftDriveEnc = new Encoder(leftDriveEncA, leftDriveEncB);
+		leftDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+		leftDriveEnc->SetPIDSourceType(PIDSourceType::kRate);
+
+		rightDriveEnc = new Encoder(rightDriveEncA, rightDriveEncB);
+		rightDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+		rightDriveEnc->SetPIDSourceType(PIDSourceType::kRate);
+
+		//leftDrivePid = new PIDController(driveP, driveI, driveD, leftDriveEnc, ???);
+		//leftDrivePid->SetOutputRange(drivePidMinOut, drivePidMaxOut);
+
+		//rightDrivePid = new PIDController(driveP, driveI, driveD, rightDriveEnc, ???);
+		//rightDrivePid->SetOutputRange(drivePidMinOut, drivePidMaxOut);
+
 		controlStick = new Joystick(controlJsCh);
 
 		rollerMotor = new CANTalon(rollerMotorId);
@@ -93,13 +115,17 @@ public:
 
 		armPid = new PIDController(potP, potI, potD, armPot, armMotor);
 		armPid->SetInputRange(potMinVolt, potMaxVolt);
-		armPid ->SetTolerance(potTol);
+		armPid->SetTolerance(potTol);
 	}
 
 	~Robot()
 	{
 		delete myRobot;
 		delete driveStick;
+		delete leftDriveEnc;
+		delete rightDriveEnc;
+		//delete leftDrivePid;
+		//delete rightDrivePid;
 		delete controlStick;
 		delete rollerMotor;
 		delete armPot;
