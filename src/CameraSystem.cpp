@@ -50,7 +50,7 @@ public:
 		for (auto y : yCoords) {
 			std::cout << "Got contour with centerY=" << y << std::endl;
 
-			double yConv = -1((y - FOV_PIX_HEIGHT/2)/(FOV_PIX_HEIGHT/2));
+			double yConv = ((y - FOV_PIX_HEIGHT/2)/(FOV_PIX_HEIGHT/2))*-1;
 
 			std::cout << "Converted to aiming system Y=" << yConv << std::endl;
 		}
