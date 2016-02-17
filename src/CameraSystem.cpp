@@ -27,6 +27,8 @@ class CameraSystem {
 public:
 	CameraSystem() {
 		twoTanTheta = 2.0*tan(VIEW_ANGLE*PI/(180.0*2.0));
+
+		std::cout << "Suuuure hope you got GRIP printing to NetworkTables..." << std::endl;
 	}
 
 	/* Requires GRIP to be running in order for this to do anything! */

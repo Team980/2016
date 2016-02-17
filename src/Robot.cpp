@@ -34,7 +34,9 @@ private:
 		//Use Z axis (twist) for rotation
 		myRobot->ArcadeDrive(stick, 1, stick, 2, true); // drive with arcade style (use right stick)
 
-		cameraSystem->Scan();
+		if (stick->GetRawButton(2)) { //left trigger to scan for targets
+			cameraSystem->Scan();
+		}
 	}
 
 	void TestPeriodic()
