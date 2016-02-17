@@ -14,11 +14,11 @@
 #include "Vision/FrcError.h"
 #include "Vision/VisionAPI.h"
 
-#define VIEW_ANGLE 59.0
+#define VIEW_ANGLE 49.0
 
-#define TARGET_WIDTH 16.75
-#define FOV_PIX_WIDTH 640
-#define FOV_PIX_HEIGHT 480
+#define TARGET_WIDTH 1.667
+#define FOV_PIX_WIDTH 320
+#define FOV_PIX_HEIGHT 240
 
 class CameraSystem {
 
@@ -38,7 +38,7 @@ public:
 		for (auto x : xCoords) {
 			std::cout << "Got contour with centerX=" << x << std::endl;
 
-			double xConv = (x - 320/2)/(640/2);
+			double xConv = (x - FOV_PIX_WIDTH/2)/(FOV_PIX_WIDTH/2);
 
 			std::cout << "Converted to aiming system X=" << xConv << std::endl;
 		}
@@ -48,22 +48,30 @@ public:
 		for (auto y : yCoords) {
 			std::cout << "Got contour with centerY=" << y << std::endl;
 
-			double yConv = -1((y - 240/2)/(240/2));
+			double yConv = -1((y - FOV_PIX_HEIGHT/2)/(FOV_PIX_HEIGHT/2));
 
 			std::cout << "Converted to aiming system Y=" << yConv << std::endl;
 		}
+
+		auto targetWidths = grip->GetNumberArray("targets/width", llvm::ArrayRef<double>());
+
+		for (auto targetWidth : targetWidths) {
+			std::cout << "Got target with width=" << targetWidth << std::endl;
+
+			double distance = TARGET_WIDTH*FOV_PIX_WIDTH/(targetWidth*twoTanTheta);
+
+			std::cout << "Got distance=" << distance << std::endl;
+		}
+
 	}
 
 private:
-	double computeDistance (ParticleAnalysisReport *report)
+	/*double computeDistance (ParticleAnalysisReport *report)
 	{
-		double distance;
-		int targetWidthPix;
+		double distance = TARGET_WIDTH*FOV_PIX_WIDTH/(targetWidth*twoTanTheta);
 
-		targetWidthPix = report->boundingRect.width;
-		distance = (TARGET_WIDTH * FOV_PIX_WIDTH) / (targetWidthPix * twoTanTheta);
 		return (distance);
-	}
+	}*/
 };
 
 
