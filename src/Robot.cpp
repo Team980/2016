@@ -8,7 +8,7 @@ private:
 	RobotDrive *myRobot; // robot drive system
 	Joystick *stick; // only joystick
 
-	CameraSystem cameraSystem; //Camera system
+	CameraSystem *cameraSystem; //Camera system
 
 	void RobotInit() {
 
@@ -34,7 +34,7 @@ private:
 		//Use Z axis (twist) for rotation
 		myRobot->ArcadeDrive(stick, 1, stick, 2, true); // drive with arcade style (use right stick)
 
-		cameraSystem.Scan();
+		cameraSystem->Scan();
 	}
 
 	void TestPeriodic()
