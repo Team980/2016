@@ -16,7 +16,7 @@
 
 #define VIEW_ANGLE 49.0
 
-#define TARGET_WIDTH 1.667
+#define TARGET_WIDTH 20 //inches
 #define FOV_PIX_WIDTH 320
 #define FOV_PIX_HEIGHT 240
 
@@ -26,14 +26,15 @@ class CameraSystem {
 
 public:
 	CameraSystem() {
-		twoTanTheta = 2.0*tan(VIEW_ANGLE*PI/(180.0*2.0));
+		twoTanTheta = 2.0*tan(VIEW_ANGLE*PI/(180*2.0));
 
+		std::cout << twoTanTheta << std::endl;
 		std::cout << "Suuuure hope you got GRIP printing to NetworkTables..." << std::endl;
 	}
 
 	/* Requires GRIP to be running in order for this to do anything! */
 	void Scan() {
-		auto grip = NetworkTable::GetTable("grip");
+		auto grip = NetworkTable::GetTable("GRIP");
 
 		auto xCoords = grip->GetNumberArray("targets/centerX", llvm::ArrayRef<double>());
 
