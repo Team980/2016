@@ -10,6 +10,7 @@
 #define leftDriveEncB 8
 #define rightDriveEncA 7
 #define rightDriveEncB 6
+#define photoSwitchCh 1
 
 //can IDs
 #define rollerMotorId 13
@@ -49,15 +50,15 @@
 #define potTol 10.0
 
 //drive parameters
-#define wheelRadius 4.0 //in inches
+#define wheelRadius 2.0 //in inches
 #define driveEncoderCounts 1024.0 //counts per revolution
 
 //drive PID values (same for both left and right drive)
-#define driveP 2.0
+#define driveP -0.0075
 #define driveI 0.0
 #define driveD 0.0
-#define drivePidMinOut -1.0
-#define drivePidMaxOut 1.0
+#define drivePidMinOut -5.0
+#define drivePidMaxOut (-1*drivePidMinOut)
 
 
 #endif /* _PARAMETERS_H_ */
