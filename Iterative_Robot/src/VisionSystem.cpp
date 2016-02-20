@@ -10,7 +10,7 @@
 #include "Vision/VisionAPI.h"
 
 /*
- * CameraSystem class.
+ * VisionSystem class.
  * Implements vision system.
  * Sorry, no dragon detection system has been implemented.
  */
