@@ -14,12 +14,12 @@
  * Implements vision system.
  * Sorry, no dragon detection system has been implemented.
  */
-class CameraSystem {
+class VisionSystem {
 
 	double twoTanTheta;
 
 public:
-	CameraSystem() {
+	VisionSystem() {
 		twoTanTheta = 2.0*tan(camViewAngle*PI/(180*2.0));
 
 		std::cout << twoTanTheta << std::endl;
