@@ -1,6 +1,7 @@
 #include "WPILib.h"
 #include "Parameters.h"
 #include "Constants.h"
+#include <math.h>
 
 class Robot: public IterativeRobot
 {
@@ -8,13 +9,11 @@ private:
 	// declarations
 	RobotDrive *myRobot; // robot drive system
 	Joystick *driveStick;
-	Encoder *leftDriveEnc;
-	Encoder *rightDriveEnc;
-	PIDController *leftDrivePid;
-	PIDController *rightDrivePid;
 	
 	Joystick *controlStick;
 	CANTalon *rollerMotor;
+	DigitalInput *photoSwitch;
+	bool rollerInOn;
 
 	//same joystick as the roller
 	AnalogInput *armPot;
@@ -23,10 +22,6 @@ private:
 
 	void RobotInit()
 	{
-		//leftDrivePid->Enable();
-
-		//rightDrivePid->Enable();
-
 		armPid->SetSetpoint(armUpPosition);
 		armPid->Enable();
 	}
@@ -52,6 +47,7 @@ private:
 		if (controlStick ->GetRawButton(rollerIn))
 		{
 			rollerMotor ->Set(rollerInSpeed);
+			rollerInOn = true;
 		}
 		else if (controlStick ->GetRawButton(rollerStop))
 		{
@@ -60,6 +56,12 @@ private:
 		else if (controlStick ->GetRawButton(rollerOut))
 		{
 			rollerMotor ->Set(rollerOutSpeed);
+		}
+
+		if (photoSwitch ->Get()== false && rollerInOn)
+		{
+			rollerMotor ->Set(rollerStopSpeed);
+			rollerInOn = false;
 		}
 
 		//arm
@@ -88,26 +90,16 @@ public:
 		myRobot->SetExpiration(0.1);
 		myRobot->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
 		myRobot->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
-		
+		myRobot->SetMaxOutput(maxOutputDriveFrac);
+
 		driveStick = new Joystick(driveJsCh);
-
-		leftDriveEnc = new Encoder(leftDriveEncA, leftDriveEncB);
-		leftDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
-		leftDriveEnc->SetPIDSourceType(PIDSourceType::kRate);
-
-		rightDriveEnc = new Encoder(rightDriveEncA, rightDriveEncB);
-		rightDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
-		rightDriveEnc->SetPIDSourceType(PIDSourceType::kRate);
-
-		//leftDrivePid = new PIDController(driveP, driveI, driveD, leftDriveEnc, ???);
-		//leftDrivePid->SetOutputRange(drivePidMinOut, drivePidMaxOut);
-
-		//rightDrivePid = new PIDController(driveP, driveI, driveD, rightDriveEnc, ???);
-		//rightDrivePid->SetOutputRange(drivePidMinOut, drivePidMaxOut);
 
 		controlStick = new Joystick(controlJsCh);
 
 		rollerMotor = new CANTalon(rollerMotorId);
+
+		photoSwitch = new DigitalInput(photoSwitchCh);
+		rollerInOn = false;
 
 		armPot = new AnalogInput(potCh);
 
@@ -122,12 +114,9 @@ public:
 	{
 		delete myRobot;
 		delete driveStick;
-		delete leftDriveEnc;
-		delete rightDriveEnc;
-		//delete leftDrivePid;
-		//delete rightDrivePid;
 		delete controlStick;
 		delete rollerMotor;
+		delete photoSwitch;
 		delete armPot;
 		delete armMotor;
 		delete armPid;
