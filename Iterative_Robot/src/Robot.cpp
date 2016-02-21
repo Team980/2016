@@ -9,6 +9,8 @@ private:
 	// declarations
 	RobotDrive *myRobot; // robot drive system
 	Joystick *driveStick;
+	Encoder *leftDriveEnc;
+	Encoder *rightDriveEnc;
 	
 	Joystick *controlStick;
 	CANTalon *rollerMotor;
@@ -28,14 +30,28 @@ private:
 
 	void AutonomousInit()
 	{
+		leftDriveEnc->Reset();
+		rightDriveEnc->Reset();
 	}
 
 	void AutonomousPeriodic()
 	{
+		double currentDistLeft = leftDriveEnc->GetDistance();
+		double currentDistRight = rightDriveEnc->GetDistance();
+
+		if(autoLeftDistInvert*currentDistLeft > autoDistance && autoRightDistInvert*currentDistRight > autoDistance)
+			myRobot->Drive(MOTOR_STOP, NO_CURVE);
+		else
+			myRobot->Drive(autoSpeed, autoCurve);
+
+		std::cout << "left" << (autoLeftDistInvert*currentDistLeft) << std::endl;
+		std::cout << "right" << (autoRightDistInvert*currentDistRight) << std::endl;
 	}
 
 	void TeleopInit()
 	{
+		leftDriveEnc->Reset();
+		rightDriveEnc->Reset();
 	}
 
 	void TeleopPeriodic()
@@ -94,6 +110,12 @@ public:
 
 		driveStick = new Joystick(driveJsCh);
 
+		leftDriveEnc = new Encoder(leftDriveEncA, leftDriveEncB);
+		leftDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+
+		rightDriveEnc = new Encoder(rightDriveEncA, rightDriveEncB);
+		rightDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+
 		controlStick = new Joystick(controlJsCh);
 
 		rollerMotor = new CANTalon(rollerMotorId);
@@ -114,6 +136,8 @@ public:
 	{
 		delete myRobot;
 		delete driveStick;
+		delete leftDriveEnc;
+		delete rightDriveEnc;
 		delete controlStick;
 		delete rollerMotor;
 		delete photoSwitch;
