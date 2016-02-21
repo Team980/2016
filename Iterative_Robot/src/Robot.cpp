@@ -26,6 +26,13 @@ private:
 	{
 		armPid->SetSetpoint(armUpPosition);
 		armPid->Enable();
+
+#if robotConfig == robot2016
+		//Show USB camera on drive station
+		CameraServer::GetInstance()->SetQuality(50);
+		//the camera name (ex "cam0") can be found through the roborio web interface
+		CameraServer::GetInstance()->StartAutomaticCapture("cam0");
+#endif //there is no usb camera for the 2015 robot
 	}
 
 	void AutonomousInit()
@@ -44,8 +51,9 @@ private:
 		else
 			myRobot->Drive(autoSpeed, autoCurve);
 
-		std::cout << "left" << (autoLeftDistInvert*currentDistLeft) << std::endl;
-		std::cout << "right" << (autoRightDistInvert*currentDistRight) << std::endl;
+		//status
+		std::cout << "leftEnc: " << (autoLeftDistInvert*currentDistLeft) << std::endl;
+		std::cout << "rightEnc: " << (autoRightDistInvert*currentDistRight) << std::endl;
 	}
 
 	void TeleopInit()
@@ -56,6 +64,10 @@ private:
 
 	void TeleopPeriodic()
 	{
+		//status
+		std::cout << "leftEnc: " << leftDriveEnc->GetDistance() << std::endl;
+		std::cout << "rightEnc: " << rightDriveEnc->GetDistance() << std::endl;
+
 		//drive
 		myRobot->ArcadeDrive(driveStick, Joystick::kYAxis, driveStick, Joystick::kZAxis, true);
 
