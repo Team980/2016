@@ -108,11 +108,11 @@
 #define fovPixHeight 240
 
 //autonomous parameters
-#define autoLeftDistInvert 1.0 //-1.0 to invert, 1.0 not to invert
-#define autoRightDistInvert -1.0 //-1.0 to invert, 1.0 not to invert
-#define autoDistance 5.0 //in feet
-#define autoSpeedInvert -1.0 //-1.0 to invert, 1.0 not to invert
-#define autoSpeed (autoSpeedInvert*0.5) //normalized speed from -1 to 1
+#define autoSpeedInvert 1.0 //-1.0 to invert, 1.0 not to invert
+#define autoLeftDistInvert -1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
+#define autoRightDistInvert 1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
+#define autoDistance 8.0 //in feet
+#define autoSpeed (autoSpeedInvert*0.9) //normalized speed from -1 to 1
 #define autoCurve NO_CURVE
 
 #endif /* _PARAMETERS_H_ */
