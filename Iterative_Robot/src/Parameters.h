@@ -8,8 +8,8 @@
 
 //pwm channels
 #if robotConfig == robot2016
-#define leftSideMotorsCh 0
-#define rightSideMotorsCh 1
+#define leftSideMotorsCh 1
+#define rightSideMotorsCh 0
 #elif robotConfig == robot2015
 #define leftSideMotorsCh 8
 #define rightSideMotorsCh 9
@@ -17,13 +17,15 @@
 
 //dio channels
 #if robotConfig == robot2016
-#define photoSwitchCh 0
+#define ballReadyPhotoSwitchCh 0
+#define ballCapturedPhotoSwitchCh 5
 #define leftDriveEncA 1
 #define leftDriveEncB 2
 #define rightDriveEncA 3
 #define rightDriveEncB 4
 #elif robotConfig == robot2015
-#define photoSwitchCh 0 //there is no photo switch but channel has to be defined
+#define ballReadyPhotoSwitchCh 0 //there is no photo switch but channel has to be defined, define as an unused channel
+#define ballCapturedPhotoSwitchCh 0 //define as an unused channel
 #define leftDriveEncA 9
 #define leftDriveEncB 8
 #define rightDriveEncA 7
@@ -52,8 +54,8 @@
 
 //joystick channels
 #define rollerIn 1
-#define rollerStop 3
-#define rollerOut 2
+#define resetArmState 2
+#define rollerEject 3
 #define armDown 8
 #define armFlat 7
 #define armUp 6
@@ -115,4 +117,10 @@
 #define autoSpeed (autoSpeedInvert*0.9) //normalized speed from -1 to 1
 #define autoCurve NO_CURVE
 
+//arm states
+#define idleState 0
+#define recieveState 1
+#define pickupState 2
+#define upState 3
+#define ejectState 4
 #endif /* _PARAMETERS_H_ */
