@@ -8,3 +8,4 @@
 #define NO_CURVE 0.0
 
 #endif /* _CONSTANTS_H_ */
+

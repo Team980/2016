@@ -14,9 +14,8 @@ private:
 	
 	Joystick *controlStick;
 	CANTalon *rollerMotor;
-	DigitalInput *ballReadyPhotoSwitch;
-	DigitalInput *ballCapturedPhotoSwitch;
-	int armState;
+	DigitalInput *photoSwitch;
+	bool rollerInOn;
 
 	//same joystick as the roller
 	AnalogInput *armPot;
@@ -28,22 +27,16 @@ private:
 		armPid->SetSetpoint(armUpPosition);
 		armPid->Enable();
 
-#if robotConfig == robot2016
 		//Show USB camera on drive station
 		CameraServer::GetInstance()->SetQuality(50);
 		//the camera name (ex "cam0") can be found through the roborio web interface
 		CameraServer::GetInstance()->StartAutomaticCapture("cam0");
-#endif //there is no usb camera for the 2015 robot
 	}
 
 	void AutonomousInit()
 	{
 		leftDriveEnc->Reset();
 		rightDriveEnc->Reset();
-
-		armState = upState; //forcing armState into upState by setting state variables
-	    armPid ->SetSetpoint(armUpPosition);
-	    rollerMotor ->Set(rollerStopSpeed);
 	}
 
 	void AutonomousPeriodic()
@@ -65,8 +58,6 @@ private:
 	{
 		leftDriveEnc->Reset();
 		rightDriveEnc->Reset();
-
-		//armState is defined in autonomous init
 	}
 
 	void TeleopPeriodic()
@@ -79,61 +70,38 @@ private:
 		myRobot->ArcadeDrive(driveStick, Joystick::kYAxis, driveStick, Joystick::kZAxis, true);
 
 		//roller
-		switch(armState)
+		if (controlStick ->GetRawButton(rollerIn))
 		{
-		case idleState:
-			armPid ->SetSetpoint(armFlatPosition);
-			rollerMotor ->Set(rollerStopSpeed);
-
-			if (controlStick ->GetRawButton(rollerIn))
-			{
-				armState = recieveState;
-			}
-
-			if (controlStick ->GetRawButton(armUp))
-			{
-				armState = upState;
-			}
-
-			if (controlStick ->GetRawButton(rollerEject))
-			{
-				armState = ejectState;
-			}
-			break;
-		case recieveState:
-			armPid ->SetSetpoint(armFlatPosition);
 			rollerMotor ->Set(rollerInSpeed);
-
-			if (ballReadyPhotoSwitch ->Get()== false)
-			{
-				armState = pickupState;
-			}
-			break;
-		case pickupState:
-			armPid ->SetSetpoint(armDownPosition);
-			rollerMotor ->Set(rollerInSpeed);
-
-			if (ballCapturedPhotoSwitch ->Get()== false)
-			{
-				armState = idleState;
-			}
-			break;
-		case upState:
-			armPid ->SetSetpoint(armUpPosition);
-			rollerMotor ->Set(rollerStopSpeed);
-			break;
-		case ejectState:
-			armPid ->SetSetpoint(armFlatPosition);
-			rollerMotor ->Set(rollerOutSpeed);
-			break;
-		default:
-			armPid ->SetSetpoint(armUpPosition);
+			rollerInOn = true;
+		}
+		else if (controlStick ->GetRawButton(rollerStop))
+		{
 			rollerMotor ->Set(rollerStopSpeed);
 		}
-
-		if (controlStick ->GetRawButton(resetArmState))
+		else if (controlStick ->GetRawButton(rollerOut))
 		{
-			armState = idleState;
+			rollerMotor ->Set(rollerOutSpeed);
+		}
+
+		if (photoSwitch ->Get()== false && rollerInOn)
+		{
+			rollerMotor ->Set(rollerStopSpeed);
+			rollerInOn = false;
+		}
+
+		//arm
+		if (controlStick ->GetRawButton(armDown))
+		{
+			armPid->SetSetpoint(armDownPosition);
+		}
+		else if (controlStick ->GetRawButton(armFlat))
+		{
+			armPid->SetSetpoint(armFlatPosition);
+		}
+		else if (controlStick ->GetRawButton(armUp))
+		{
+			armPid->SetSetpoint(armUpPosition);
 		}
 	}
 
@@ -162,11 +130,8 @@ public:
 
 		rollerMotor = new CANTalon(rollerMotorId);
 
-		ballReadyPhotoSwitch = new DigitalInput(ballReadyPhotoSwitchCh);
-
-		ballCapturedPhotoSwitch = new DigitalInput(ballCapturedPhotoSwitchCh);
-
-		//armState is initialized in autonomous
+		photoSwitch = new DigitalInput(photoSwitchCh);
+		rollerInOn = false;
 
 		armPot = new AnalogInput(potCh);
 
@@ -185,8 +150,7 @@ public:
 		delete rightDriveEnc;
 		delete controlStick;
 		delete rollerMotor;
-		delete ballReadyPhotoSwitch;
-		delete ballCapturedPhotoSwitch;
+		delete photoSwitch;
 		delete armPot;
 		delete armMotor;
 		delete armPid;
@@ -194,3 +158,4 @@ public:
 };
 
 START_ROBOT_CLASS(Robot);
+
