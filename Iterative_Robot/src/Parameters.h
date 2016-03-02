@@ -4,32 +4,32 @@
 //robot config
 #define robot2015 0
 #define robot2016 1
-#define robotConfig robot2016
+#define robotConfig robot2015
 
 //pwm channels
 #if robotConfig == robot2016
 #define leftSideMotorsCh 1
 #define rightSideMotorsCh 0
 #elif robotConfig == robot2015
-#define leftSideMotorsCh 8
-#define rightSideMotorsCh 9
+#define leftSideMotorsCh 9
+#define rightSideMotorsCh 8
 #endif
 
 //dio channels
 #if robotConfig == robot2016
-#define ballReadyPhotoSwitchCh 0
-#define ballCapturedPhotoSwitchCh 5
-#define leftDriveEncA 1
-#define leftDriveEncB 2
-#define rightDriveEncA 3
-#define rightDriveEncB 4
+#define ballReadyPhotoSwitchCh 5
+#define ballCapturedPhotoSwitchCh 0
+#define leftDriveEncA 3
+#define leftDriveEncB 4
+#define rightDriveEncA 1
+#define rightDriveEncB 2
 #elif robotConfig == robot2015
 #define ballReadyPhotoSwitchCh 0 //there is no photo switch but channel has to be defined, define as an unused channel
 #define ballCapturedPhotoSwitchCh 0 //define as an unused channel
-#define leftDriveEncA 9
-#define leftDriveEncB 8
-#define rightDriveEncA 7
-#define rightDriveEncB 6
+#define leftDriveEncA 7
+#define leftDriveEncB 6
+#define rightDriveEncA 9
+#define rightDriveEncB 8
 #endif
 
 //can IDs
@@ -54,8 +54,8 @@
 
 //joystick channels
 #define rollerIn 1
-#define resetArmState 2
-#define rollerEject 3
+#define resetArmState 3
+#define rollerEject 2
 #define armDown 8
 #define armFlat 7
 #define armUp 6
@@ -110,12 +110,19 @@
 #define fovPixHeight 240
 
 //autonomous parameters
+#define autoCurve NO_CURVE
+#define autoDistance 8.0 //in feet
+#if robotConfig == robot2016
 #define autoSpeedInvert 1.0 //-1.0 to invert, 1.0 not to invert
 #define autoLeftDistInvert -1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
 #define autoRightDistInvert 1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
-#define autoDistance 8.0 //in feet
 #define autoSpeed (autoSpeedInvert*0.9) //normalized speed from -1 to 1
-#define autoCurve NO_CURVE
+#elif robotConfig == robot2015
+#define autoSpeedInvert 1.0 //-1.0 to invert, 1.0 not to invert
+#define autoLeftDistInvert -1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
+#define autoRightDistInvert 1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
+#define autoSpeed (autoSpeedInvert*0.9) //normalized speed from -1 to 1
+#endif
 
 //arm states
 #define idleState 0
@@ -123,4 +130,5 @@
 #define pickupState 2
 #define upState 3
 #define ejectState 4
+
 #endif /* _PARAMETERS_H_ */
