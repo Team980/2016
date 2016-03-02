@@ -24,7 +24,7 @@ private:
 	PIDController *armPid;
 
 	//Network Tables
-	std::shared_ptr<NetworkTable> dataTablePtr;
+	//std::shared_ptr<NetworkTable> dataTablePtr;
 
 	void RobotInit()
 	{
@@ -62,8 +62,8 @@ private:
 		//status
 		//std::cout << "leftEnc: " << (autoLeftDistInvert*currentDistLeft) << std::endl;
 		//std::cout << "rightEnc: " << (autoRightDistInvert*currentDistRight) << std::endl;
-		dataTablePtr ->PutNumber("signedLeftEncDist", autoLeftDistInvert*currentDistLeft);
-		dataTablePtr ->PutNumber ("signedRightEncDist", autoRightDistInvert*currentDistRight);
+		//dataTablePtr ->PutNumber("signedLeftEncDist", autoLeftDistInvert*currentDistLeft);
+		//dataTablePtr ->PutNumber ("signedRightEncDist", autoRightDistInvert*currentDistRight);
 	}
 
 	void TeleopInit()
@@ -140,14 +140,14 @@ private:
 		//status
 		//std::cout << "leftEnc: " << leftDriveEnc->GetDistance() << std::endl;
 		//std::cout << "rightEnc: " << rightDriveEnc->GetDistance() << std::endl;
-		dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
+		/*dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
 		dataTablePtr ->PutNumber ("RightEncDist", rightDriveEnc->GetDistance());
 		dataTablePtr ->PutBoolean("ballCapturedPhotoSwitch", ballCapturedPhotoSwitch);
 		dataTablePtr ->PutBoolean("ballReadyPhotoSwitch", ballReadyPhotoSwitch);
 		dataTablePtr ->PutNumber("armPidSetpoint", armPid ->GetSetpoint());
 		dataTablePtr ->PutNumber("armPidError", armPid ->GetError());
 		dataTablePtr ->PutNumber("armPot", armPot ->GetVoltage());
-		dataTablePtr ->PutNumber("armState", armState);
+		dataTablePtr ->PutNumber("armState", armState);*/
 	}
 
 	void TestPeriodic()
