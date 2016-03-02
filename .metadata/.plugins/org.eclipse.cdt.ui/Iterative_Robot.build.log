@@ -1,0 +1,8 @@
+20:22:43 **** Rebuild of configuration Debug for project Iterative_Robot ****
+Info: Internal Builder is used for build
+arm-frc-linux-gnueabi-g++ -std=c++1y "-IC:\\Users\\Bonnie/wpilib/cpp/current/include" "-IC:\\Users\\Bonnie\\Documents\\GitHub\\2016\\Iterative_Robot\\src" -O0 -g3 -Wall -c -fmessage-length=0 -o "src\\VisionSystem.o" "..\\src\\VisionSystem.cpp" 
+arm-frc-linux-gnueabi-g++ -std=c++1y "-IC:\\Users\\Bonnie/wpilib/cpp/current/include" "-IC:\\Users\\Bonnie\\Documents\\GitHub\\2016\\Iterative_Robot\\src" -O0 -g3 -Wall -c -fmessage-length=0 -o "src\\Robot.o" "..\\src\\Robot.cpp" 
+arm-frc-linux-gnueabi-g++ "-LC:\\Users\\Bonnie/wpilib/cpp/current/lib" -Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a,-rpath,/usr/local/frc/rpath-lib -o FRCUserProgram "src\\Robot.o" "src\\VisionSystem.o" -lwpi 
+
+20:22:50 Build Finished (took 7s.264ms)
+
