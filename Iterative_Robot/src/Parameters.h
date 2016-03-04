@@ -24,7 +24,7 @@
 #define rightDriveEncA 1
 #define rightDriveEncB 2
 #elif robotConfig == robot2015
-#define ballReadyPhotoSwitchCh 0 //there is no photo switch but channel has to be defined, define as an unused channel
+#define ballReadyPhotoSwitchCh 5 //there is no photo switch but channel has to be defined, define as an unused channel
 #define ballCapturedPhotoSwitchCh 0 //define as an unused channel
 #define leftDriveEncA 7
 #define leftDriveEncB 6

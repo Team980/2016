@@ -14,8 +14,8 @@ private:
 	
 	Joystick *controlStick;
 	CANTalon *rollerMotor;
-	DigitalInput *ballReadyPhotoSwitch;
-	DigitalInput *ballCapturedPhotoSwitch;
+	DigitalInput *ballReadyPhotoSwitch; //not broken=false ,broken=true (opposite convention of ballCapturedPhotoSwitch)
+	DigitalInput *ballCapturedPhotoSwitch; //not broken=true ,broken=false (opposite convention of ballReadyPhotoSwitch)
 	int armState;
 
 	//same joystick as the roller
@@ -24,12 +24,14 @@ private:
 	PIDController *armPid;
 
 	//Network Tables
-	//std::shared_ptr<NetworkTable> dataTablePtr;
+	std::shared_ptr<NetworkTable> dataTablePtr;
 
 	void RobotInit()
 	{
 		armPid->SetSetpoint(armUpPosition);
 		armPid->Enable();
+
+		dataTablePtr = NetworkTable::GetTable("dataTable");
 
 #if robotConfig == robot2016
 		//Show USB camera on drive station
@@ -62,8 +64,8 @@ private:
 		//status
 		//std::cout << "leftEnc: " << (autoLeftDistInvert*currentDistLeft) << std::endl;
 		//std::cout << "rightEnc: " << (autoRightDistInvert*currentDistRight) << std::endl;
-		//dataTablePtr ->PutNumber("signedLeftEncDist", autoLeftDistInvert*currentDistLeft);
-		//dataTablePtr ->PutNumber ("signedRightEncDist", autoRightDistInvert*currentDistRight);
+		dataTablePtr ->PutNumber("signedLeftEncDist", autoLeftDistInvert*currentDistLeft);
+		dataTablePtr ->PutNumber ("signedRightEncDist", autoRightDistInvert*currentDistRight);
 	}
 
 	void TeleopInit()
@@ -105,7 +107,7 @@ private:
 			armPid ->SetSetpoint(armFlatPosition);
 			rollerMotor ->Set(rollerInSpeed);
 
-			if (ballReadyPhotoSwitch ->Get()== false)
+			if (ballReadyPhotoSwitch ->Get()== true) //beam is broken
 			{
 				armState = pickupState;
 			}
@@ -114,7 +116,7 @@ private:
 			armPid ->SetSetpoint(armDownPosition);
 			rollerMotor ->Set(rollerInSpeed);
 
-			if (ballCapturedPhotoSwitch ->Get()== false)
+			if (ballCapturedPhotoSwitch ->Get()== false) //beam is broken
 			{
 				armState = idleState;
 			}
@@ -140,14 +142,14 @@ private:
 		//status
 		//std::cout << "leftEnc: " << leftDriveEnc->GetDistance() << std::endl;
 		//std::cout << "rightEnc: " << rightDriveEnc->GetDistance() << std::endl;
-		/*dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
+		dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
 		dataTablePtr ->PutNumber ("RightEncDist", rightDriveEnc->GetDistance());
-		dataTablePtr ->PutBoolean("ballCapturedPhotoSwitch", ballCapturedPhotoSwitch);
-		dataTablePtr ->PutBoolean("ballReadyPhotoSwitch", ballReadyPhotoSwitch);
+		dataTablePtr ->PutBoolean("ballCapturedPhotoSwitch", ballCapturedPhotoSwitch->Get());
+		dataTablePtr ->PutBoolean("ballReadyPhotoSwitch", ballReadyPhotoSwitch->Get());
 		dataTablePtr ->PutNumber("armPidSetpoint", armPid ->GetSetpoint());
 		dataTablePtr ->PutNumber("armPidError", armPid ->GetError());
 		dataTablePtr ->PutNumber("armPot", armPot ->GetVoltage());
-		dataTablePtr ->PutNumber("armState", armState);*/
+		dataTablePtr ->PutNumber("armState", armState);
 	}
 
 	void TestPeriodic()
