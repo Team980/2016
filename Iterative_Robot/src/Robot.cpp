@@ -56,16 +56,14 @@ private:
 		double currentDistLeft = leftDriveEnc->GetDistance();
 		double currentDistRight = rightDriveEnc->GetDistance();
 
-		if(autoLeftDistInvert*currentDistLeft > autoDistance && autoRightDistInvert*currentDistRight > autoDistance)
-			myRobot->Drive(MOTOR_STOP, NO_CURVE);
+		if(currentDistLeft > autoDistance && currentDistRight > autoDistance)
+			myRobot->SetLeftRightMotorOutputs(MOTOR_STOP, MOTOR_STOP);
 		else
-			myRobot->Drive(autoSpeed, autoCurve);
+			myRobot->SetLeftRightMotorOutputs(autoSpeedInvert*autoLeftSpeed, autoSpeedInvert*autoRightSpeed);
 
 		//status
-		//std::cout << "leftEnc: " << (autoLeftDistInvert*currentDistLeft) << std::endl;
-		//std::cout << "rightEnc: " << (autoRightDistInvert*currentDistRight) << std::endl;
-		dataTablePtr ->PutNumber("signedLeftEncDist", autoLeftDistInvert*currentDistLeft);
-		dataTablePtr ->PutNumber ("signedRightEncDist", autoRightDistInvert*currentDistRight);
+		dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
+		dataTablePtr ->PutNumber ("RightEncDist", rightDriveEnc->GetDistance());
 	}
 
 	void TeleopInit()
@@ -140,8 +138,6 @@ private:
 		}
 
 		//status
-		//std::cout << "leftEnc: " << leftDriveEnc->GetDistance() << std::endl;
-		//std::cout << "rightEnc: " << rightDriveEnc->GetDistance() << std::endl;
 		dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
 		dataTablePtr ->PutNumber ("RightEncDist", rightDriveEnc->GetDistance());
 		dataTablePtr ->PutBoolean("ballCapturedPhotoSwitch", ballCapturedPhotoSwitch->Get());
@@ -169,9 +165,11 @@ public:
 
 		leftDriveEnc = new Encoder(leftDriveEncA, leftDriveEncB);
 		leftDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+		leftDriveEnc->SetReverseDirection(leftEncInv);
 
 		rightDriveEnc = new Encoder(rightDriveEncA, rightDriveEncB);
 		rightDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+		rightDriveEnc->SetReverseDirection(rightEncInv);
 
 		controlStick = new Joystick(controlJsCh);
 

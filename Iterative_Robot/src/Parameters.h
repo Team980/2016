@@ -24,8 +24,8 @@
 #define rightDriveEncA 1
 #define rightDriveEncB 2
 #elif robotConfig == robot2015
-#define ballReadyPhotoSwitchCh 5 //there is no photo switch but channel has to be defined, define as an unused channel
-#define ballCapturedPhotoSwitchCh 0 //define as an unused channel
+#define ballReadyPhotoSwitchCh 5
+#define ballCapturedPhotoSwitchCh 0
 #define leftDriveEncA 7
 #define leftDriveEncB 6
 #define rightDriveEncA 9
@@ -37,8 +37,8 @@
 #define rollerMotorId 1
 #define armMotorId 2
 #elif robotConfig == robot2015
-#define rollerMotorId 13
-#define armMotorId 10
+#define rollerMotorId 10
+#define armMotorId 13
 #endif
 
 //analog channels
@@ -79,14 +79,14 @@
 //potentiometer PID values
 #define potMinVolt 0.0
 #define potMaxVolt 5.0
-#define potTol 10.0
+#define potTol 10.0 //percent
 //
 #if robotConfig == robot2016
-#define potP 3.0
+#define potP 1.1
 #define potI 0.0
 #define potD 0.0
 #elif robotConfig == robot2015
-#define potP 3.0
+#define potP 1.1
 #define potI 0.0
 #define potD 0.0
 #endif
@@ -98,9 +98,13 @@
 #if robotConfig == robot2016
 #define maxOutputDriveFrac 0.6 //limit the drive motor output to this fraction of the total possible
 #define wheelRadius 4.0 //inches
+#define leftEncInv false
+#define rightEncInv true
 #elif robotConfig == robot2015
 #define maxOutputDriveFrac 0.7 //limit the drive motor output to this fraction of the total possible
 #define wheelRadius 2.0 //inches
+#define leftEncInv false
+#define rightEncInv true
 #endif
 
 //camera system parameters
@@ -110,18 +114,15 @@
 #define fovPixHeight 240
 
 //autonomous parameters
-#define autoCurve NO_CURVE
 #define autoDistance 8.0 //in feet
 #if robotConfig == robot2016
-#define autoSpeedInvert 1.0 //-1.0 to invert, 1.0 not to invert
-#define autoLeftDistInvert -1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
-#define autoRightDistInvert 1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
-#define autoSpeed (autoSpeedInvert*0.9) //normalized speed from -1 to 1
+#define autoLeftSpeed 0.9 //normalized speed from -1 to 1
+#define autoRightSpeed 0.9
+#define autoSpeedInvert -1.0 // -1 to invert; 1 to not invert
 #elif robotConfig == robot2015
-#define autoSpeedInvert 1.0 //-1.0 to invert, 1.0 not to invert
-#define autoLeftDistInvert -1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
-#define autoRightDistInvert 1.0*autoSpeedInvert //-1.0 to invert, 1.0 not to invert
-#define autoSpeed (autoSpeedInvert*0.9) //normalized speed from -1 to 1
+#define autoLeftSpeed 0.9 //normalized speed from -1 to 1
+#define autoRightSpeed 0.8
+#define autoSpeedInvert -1.0 // -1 to invert; 1 to not invert
 #endif
 
 //arm states
