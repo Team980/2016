@@ -5,7 +5,5 @@
 #define PI 3.141592653
 
 #define MOTOR_STOP 0.0
-#define NO_CURVE 0.0
 
 #endif /* _CONSTANTS_H_ */
-

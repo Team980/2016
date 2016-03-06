@@ -14,7 +14,7 @@ private:
 	
 	Joystick *controlStick;
 	CANTalon *rollerMotor;
-	DigitalInput *photoSwitch;
+	DigitalInput *ballCapturedPhotoSwitch; //not broken=true ,broken=false
 	bool rollerInOn;
 
 	//same joystick as the roller
@@ -30,16 +30,23 @@ private:
 		armPid->SetSetpoint(armUpPosition);
 		armPid->Enable();
 
+		dataTablePtr = NetworkTable::GetTable("dataTable");
+
+#if robotConfig == robot2016
 		//Show USB camera on drive station
 		CameraServer::GetInstance()->SetQuality(50);
 		//the camera name (ex "cam0") can be found through the roborio web interface
 		CameraServer::GetInstance()->StartAutomaticCapture("cam0");
+#endif
 	}
 
 	void AutonomousInit()
 	{
 		leftDriveEnc->Reset();
 		rightDriveEnc->Reset();
+
+		armPid ->SetSetpoint(armUpPosition);
+		rollerMotor ->Set(rollerStopSpeed);
 	}
 
 	void AutonomousPeriodic()
@@ -47,16 +54,14 @@ private:
 		double currentDistLeft = leftDriveEnc->GetDistance();
 		double currentDistRight = rightDriveEnc->GetDistance();
 
-		if(autoLeftDistInvert*currentDistLeft > autoDistance && autoRightDistInvert*currentDistRight > autoDistance)
-			myRobot->Drive(MOTOR_STOP, NO_CURVE);
+		if(currentDistLeft > autoDistance && currentDistRight > autoDistance)
+			myRobot->SetLeftRightMotorOutputs(MOTOR_STOP, MOTOR_STOP);
 		else
-			myRobot->Drive(autoSpeed, autoCurve);
+			myRobot->SetLeftRightMotorOutputs(autoSpeedInvert*autoLeftSpeed, autoSpeedInvert*autoRightSpeed);
 
 		//status
-		//std::cout << "leftEnc: " << (autoLeftDistInvert*currentDistLeft) << std::endl;
-		//std::cout << "rightEnc: " << (autoRightDistInvert*currentDistRight) << std::endl;
-		dataTablePtr ->PutNumber("signedLeftEncDist", autoLeftDistInvert*currentDistLeft);
-		dataTablePtr ->PutNumber ("signedRightEncDist", autoRightDistInvert*currentDistRight);
+		dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
+		dataTablePtr ->PutNumber ("RightEncDist", rightDriveEnc->GetDistance());
 	}
 
 	void TeleopInit()
@@ -79,13 +84,14 @@ private:
 		else if (controlStick ->GetRawButton(rollerStop))
 		{
 			rollerMotor ->Set(rollerStopSpeed);
+			rollerInOn = false;
 		}
 		else if (controlStick ->GetRawButton(rollerOut))
 		{
 			rollerMotor ->Set(rollerOutSpeed);
 		}
 
-		if (photoSwitch ->Get()== false && rollerInOn)
+		if (ballCapturedPhotoSwitch ->Get()== false && rollerInOn)
 		{
 			rollerMotor ->Set(rollerStopSpeed);
 			rollerInOn = false;
@@ -106,12 +112,10 @@ private:
 		}
 
 		//status
-		//std::cout << "leftEnc: " << leftDriveEnc->GetDistance() << std::endl;
-		//std::cout << "rightEnc: " << rightDriveEnc->GetDistance() << std::endl;
 		dataTablePtr ->PutNumber("LeftEncDist", leftDriveEnc->GetDistance());
 		dataTablePtr ->PutNumber ("RightEncDist", rightDriveEnc->GetDistance());
 		dataTablePtr ->PutBoolean("rollerInOn", rollerInOn);
-		dataTablePtr ->PutBoolean("photoSwitch", photoSwitch);
+		dataTablePtr ->PutBoolean("ballCapturedPhotoSwitch", ballCapturedPhotoSwitch->Get());
 		dataTablePtr ->PutNumber("armPidSetpoint", armPid ->GetSetpoint());
 		dataTablePtr ->PutNumber("armPidError", armPid ->GetError());
 		dataTablePtr ->PutNumber("armPot", armPot ->GetVoltage());
@@ -134,15 +138,17 @@ public:
 
 		leftDriveEnc = new Encoder(leftDriveEncA, leftDriveEncB);
 		leftDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+		leftDriveEnc->SetReverseDirection(leftEncInv);
 
 		rightDriveEnc = new Encoder(rightDriveEncA, rightDriveEncB);
 		rightDriveEnc->SetDistancePerPulse((2*PI*(wheelRadius/INCHES_IN_FEET))/driveEncoderCounts);
+		rightDriveEnc->SetReverseDirection(rightEncInv);
 
 		controlStick = new Joystick(controlJsCh);
 
 		rollerMotor = new CANTalon(rollerMotorId);
 
-		photoSwitch = new DigitalInput(photoSwitchCh);
+		ballCapturedPhotoSwitch = new DigitalInput(ballCapturedPhotoSwitchCh);
 		rollerInOn = false;
 
 		armPot = new AnalogInput(potCh);
@@ -162,7 +168,7 @@ public:
 		delete rightDriveEnc;
 		delete controlStick;
 		delete rollerMotor;
-		delete photoSwitch;
+		delete ballCapturedPhotoSwitch;
 		delete armPot;
 		delete armMotor;
 		delete armPid;
@@ -170,4 +176,3 @@ public:
 };
 
 START_ROBOT_CLASS(Robot);
-
