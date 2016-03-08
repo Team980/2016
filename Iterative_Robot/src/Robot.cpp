@@ -28,7 +28,7 @@ private:
 	void RobotInit()
 	{
 		armPid->SetSetpoint(armUpPosition);
-		armPid->Enable();
+		//armPid->Enable();
 
 		dataTablePtr = NetworkTable::GetTable("dataTable");
 
@@ -78,7 +78,7 @@ private:
 		//roller
 		if (controlStick ->GetRawButton(rollerIn))
 		{
-			rollerMotor ->Set(rollerInSpeed);
+			rollerMotor ->Set(armInvState*rollerInSpeed);
 			rollerInOn = true;
 		}
 		else if (controlStick ->GetRawButton(rollerStop))
@@ -88,7 +88,7 @@ private:
 		}
 		else if (controlStick ->GetRawButton(rollerOut))
 		{
-			rollerMotor ->Set(rollerOutSpeed);
+			rollerMotor ->Set(armInvState*rollerOutSpeed);
 		}
 
 		if (ballCapturedPhotoSwitch ->Get()== false && rollerInOn)

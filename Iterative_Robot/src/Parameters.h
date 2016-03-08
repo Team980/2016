@@ -61,7 +61,14 @@
 //control joystick settings
 #define rollerInSpeed 0.5
 #define rollerStopSpeed 0.0
-#define rollerOutSpeed -0.5
+#define rollerOutSpeed -0.85
+
+//Arm invert state (arm stuff)
+#if robotConfig == robot2016
+#define armInvState -1.0  // -1 to invert; 1 to not invert
+#elif robotConfig == robot2015
+#define armInvState -1.0
+#endif
 
 //potentiometer set points (all in volts)
 #if robotConfig == robot2016
