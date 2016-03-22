@@ -27,16 +27,13 @@ private:
 
 	void RobotInit()
 	{
-		armPid->SetSetpoint(armUpPosition);
-		//armPid->Enable();
-
 		dataTablePtr = NetworkTable::GetTable("dataTable");
 
 #if robotConfig == robot2016
 		//Show USB camera on drive station
-		CameraServer::GetInstance()->SetQuality(50);
+		//CameraServer::GetInstance()->SetQuality(50);
 		//the camera name (ex "cam0") can be found through the roborio web interface
-		CameraServer::GetInstance()->StartAutomaticCapture("cam0");
+		//CameraServer::GetInstance()->StartAutomaticCapture("cam0");
 #endif
 	}
 
@@ -45,7 +42,11 @@ private:
 		leftDriveEnc->Reset();
 		rightDriveEnc->Reset();
 
-		armPid ->SetSetpoint(armUpPosition);
+		armPid->SetPID(potP, potIAuto, potD);
+		//armPid ->SetSetpoint(armFlatPosition); //Uncomment this is want to go under the LOW BAR in autonomous
+		armPid->SetSetpoint(armPot->GetAverageVoltage()); //hold the current position
+		armPid->Enable();
+
 		rollerMotor ->Set(rollerStopSpeed);
 	}
 
@@ -66,49 +67,63 @@ private:
 
 	void TeleopInit()
 	{
+		armPid->SetPID(potP, potITeleop, potD);
+		armPid->Disable();
+
 		leftDriveEnc->Reset();
 		rightDriveEnc->Reset();
 	}
 
 	void TeleopPeriodic()
 	{
+		//sets driving mode
+		if(driveStick->GetRawButton(highSpeedMode))
+		{
+			myRobot->SetMaxOutput(maxOutputDriveFracHigh);
+		}
+		else
+		{
+			myRobot->SetMaxOutput(maxOutputDriveFracLow);
+		}
+
 		//drive
 		myRobot->ArcadeDrive(driveStick, Joystick::kYAxis, driveStick, Joystick::kZAxis, true);
-
 		//roller
 		if (controlStick ->GetRawButton(rollerIn))
 		{
-			rollerMotor ->Set(armInvState*rollerInSpeed);
+			rollerMotor ->Set(rollerInvState*rollerInSpeed);
 			rollerInOn = true;
 		}
 		else if (controlStick ->GetRawButton(rollerStop))
 		{
 			rollerMotor ->Set(rollerStopSpeed);
 			rollerInOn = false;
-		}
+    	}
 		else if (controlStick ->GetRawButton(rollerOut))
 		{
-			rollerMotor ->Set(armInvState*rollerOutSpeed);
-		}
-
-		if (ballCapturedPhotoSwitch ->Get()== false && rollerInOn)
-		{
-			rollerMotor ->Set(rollerStopSpeed);
+			rollerMotor ->Set(rollerInvState*rollerOutSpeed);
 			rollerInOn = false;
 		}
 
+		/*if (ballCapturedPhotoSwitch ->Get()== false && rollerInOn)
+		{
+			rollerMotor ->Set(rollerStopSpeed);
+			rollerInOn = false;
+		}*/
+
 		//arm
-		if (controlStick ->GetRawButton(armDown))
+		/*if (controlStick ->GetRawButton(armDown))
 		{
 			armPid->SetSetpoint(armDownPosition);
-		}
-		else if (controlStick ->GetRawButton(armFlat))
+		}*/
+		if (controlStick ->GetRawButton(armFlat))
 		{
-			armPid->SetSetpoint(armFlatPosition);
+			armPid->Disable();
 		}
 		else if (controlStick ->GetRawButton(armUp))
 		{
 			armPid->SetSetpoint(armUpPosition);
+			armPid->Enable();
 		}
 
 		//status
@@ -119,6 +134,8 @@ private:
 		dataTablePtr ->PutNumber("armPidSetpoint", armPid ->GetSetpoint());
 		dataTablePtr ->PutNumber("armPidError", armPid ->GetError());
 		dataTablePtr ->PutNumber("armPot", armPot ->GetVoltage());
+		dataTablePtr ->PutNumber("yAxis", driveStick ->GetRawAxis(1));
+		dataTablePtr ->PutNumber("zAxis", driveStick ->GetRawAxis(2));
 	}
 
 	void TestPeriodic()
@@ -132,7 +149,7 @@ public:
 		myRobot->SetExpiration(0.1);
 		myRobot->SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
 		myRobot->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
-		myRobot->SetMaxOutput(maxOutputDriveFrac);
+		myRobot->SetMaxOutput(maxOutputDriveFracLow);
 
 		driveStick = new Joystick(driveJsCh);
 
@@ -155,7 +172,7 @@ public:
 
 		armMotor = new CANTalon(armMotorId);
 
-		armPid = new PIDController(potP, potI, potD, armPot, armMotor);
+		armPid = new PIDController(potP, potIAuto, potD, armPot, armMotor);
 		armPid->SetInputRange(potMinVolt, potMaxVolt);
 		armPid->SetTolerance(potTol);
 	}
