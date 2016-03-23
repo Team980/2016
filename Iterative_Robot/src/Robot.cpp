@@ -44,10 +44,17 @@ private:
 		leftDriveEnc->Reset();
 		rightDriveEnc->Reset();
 
+<<<<<<< HEAD
 		armMotor->SetPID(potP, potIAuto, potD);
 		//armPid ->SetSetpoint(armFlatPosition); //Uncomment this is want to go under the LOW BAR in autonomous
 		armMotor->SetSetpoint(armMotor->Get()); //hold the current position
 		armMotor->EnableControl();
+=======
+		armPid->SetPID(potP, potIAuto, potD);
+		//armPid ->SetSetpoint(armFlatPosition); //Uncomment this is want to go under the LOW BAR in autonomous
+		armPid->SetSetpoint(armPot->GetAverageVoltage()); //hold the current position
+		armPid->Enable();
+>>>>>>> origin/2016_Robot_ManualArm
 
 		rollerMotor ->Set(rollerStopSpeed);
 	}
@@ -69,10 +76,15 @@ private:
 
 	void TeleopInit()
 	{
+<<<<<<< HEAD
 		/*armPid->SetPID(potP, potITeleop, potD);
 		armPid->Disable();*/
 		armMotor->SetPID(potP,potITeleop,potD);
 	    armMotor->EnableControl();
+=======
+		armPid->SetPID(potP, potITeleop, potD);
+		armPid->Disable();
+>>>>>>> origin/2016_Robot_ManualArm
 
 		leftDriveEnc->Reset();
 		rightDriveEnc->Reset();
@@ -91,8 +103,12 @@ private:
 		}
 
 		//drive
+<<<<<<< HEAD
 		myRobot->ArcadeDrive(driveStick, Joystick::kYAxis, driveWheel, Joystick::kXAxis, true);
 		//myRobot->ArcadeDrive(driveStick, Joystick::kYAxis, driveStick, Joystick::kZAxis, true);
+=======
+		myRobot->ArcadeDrive(driveStick, Joystick::kYAxis, driveStick, Joystick::kZAxis, true);
+>>>>>>> origin/2016_Robot_ManualArm
 		//roller
 		if (controlStick ->GetRawButton(rollerIn))
 		{
@@ -120,7 +136,11 @@ private:
 		/*if (controlStick ->GetRawButton(armDown))
 		{
 			armPid->SetSetpoint(armDownPosition);
+<<<<<<< HEAD
 		}
+=======
+		}*/
+>>>>>>> origin/2016_Robot_ManualArm
 		if (controlStick ->GetRawButton(armFlat))
 		{
 			armPid->Disable();
@@ -129,6 +149,7 @@ private:
 		{
 			armPid->SetSetpoint(armUpPosition);
 			armPid->Enable();
+<<<<<<< HEAD
 		}*/
 		if (controlStick->GetRawButton(armUp))
 		{
@@ -150,6 +171,8 @@ private:
 		{
 			armMotor->Disable();
 			armDownStatus = false;
+=======
+>>>>>>> origin/2016_Robot_ManualArm
 		}
 
 		//status
@@ -157,9 +180,17 @@ private:
 		dataTablePtr ->PutNumber ("RightEncDist", rightDriveEnc->GetDistance());
 		dataTablePtr ->PutBoolean("rollerInOn", rollerInOn);
 		dataTablePtr ->PutBoolean("ballCapturedPhotoSwitch", ballCapturedPhotoSwitch->Get());
+<<<<<<< HEAD
 		dataTablePtr ->PutNumber("armPidSetpoint", armMotor ->GetSetpoint());
 		//dataTablePtr ->PutNumber("armPidError", armPot ->GetError());
 		dataTablePtr ->PutNumber("armEnc", armMotor ->Get());
+=======
+		dataTablePtr ->PutNumber("armPidSetpoint", armPid ->GetSetpoint());
+		dataTablePtr ->PutNumber("armPidError", armPid ->GetError());
+		dataTablePtr ->PutNumber("armPot", armPot ->GetVoltage());
+		dataTablePtr ->PutNumber("yAxis", driveStick ->GetRawAxis(1));
+		dataTablePtr ->PutNumber("zAxis", driveStick ->GetRawAxis(2));
+>>>>>>> origin/2016_Robot_ManualArm
 	}
 
 	void TestPeriodic()
@@ -197,7 +228,11 @@ public:
 
 		armMotor = new CANTalon(armMotorId);
 
+<<<<<<< HEAD
 		/*armPid = new PIDController(potP, potIAuto, potD, armPot, armMotor);
+=======
+		armPid = new PIDController(potP, potIAuto, potD, armPot, armMotor);
+>>>>>>> origin/2016_Robot_ManualArm
 		armPid->SetInputRange(potMinVolt, potMaxVolt);
 		armPid->SetTolerance(potTol);*/
 		armMotor ->SetControlMode(CANSpeedController::kPosition);

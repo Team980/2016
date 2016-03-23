@@ -4,7 +4,7 @@
 //robot config
 #define robot2015 0
 #define robot2016 1
-#define robotConfig robot2015
+#define robotConfig robot2016
 
 //pwm channels
 #if robotConfig == robot2016
@@ -76,6 +76,7 @@
 
 //potentiometer set points (all in volts)
 #if robotConfig == robot2016
+<<<<<<< HEAD
 #define armFlatPosition -0.65
 #define armDownPosition armFlatPosition
 #define armUpPosition -0.54
@@ -83,6 +84,15 @@
 #define armFlatPosition -1.65
 #define armDownPosition armFlatPosition
 #define armUpPosition -1.54
+=======
+#define armFlatPosition 1.11
+#define armDownPosition armFlatPosition
+#define armUpPosition 0.1
+#elif robotConfig == robot2015
+#define armFlatPosition 0.38
+#define armDownPosition armFlatPosition
+#define armUpPosition 1.45
+>>>>>>> origin/2016_Robot_ManualArm
 #endif
 
 //potentiometer PID values
@@ -91,6 +101,7 @@
 #define potTol 1.0 //percent
 //
 #if robotConfig == robot2016
+<<<<<<< HEAD
 #define potP 1.0
 #define potIAuto 0.0
 #define potITeleop 0.0006
@@ -100,6 +111,17 @@
 #define potIAuto 0.0
 #define potITeleop 0.0006
 #define potD 100.0
+=======
+#define potP -0.4
+#define potIAuto 0.0
+#define potITeleop -0.01
+#define potD 0.0
+#elif robotConfig == robot2015
+#define potP -0.2
+#define potIAuto 0.0
+#define potITeleop -0.005
+#define potD 0.0
+>>>>>>> origin/2016_Robot_ManualArm
 #endif
 
 
