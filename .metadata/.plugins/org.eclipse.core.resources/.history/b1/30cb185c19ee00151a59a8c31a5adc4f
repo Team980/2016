@@ -1,0 +1,58 @@
+#include "WPILib.h"
+
+/**
+ * This sample shows how to use the new CANTalon to just run a motor in a basic
+ *   throttle mode, in the same manner as you might control a traditional PWM
+ *   controlled motor.
+ *
+ */
+class Robot : public SampleRobot {
+	CANTalon m_motor;
+
+  Joystick m_stick;
+
+	// update every 0.01 seconds/10 milliseconds.
+  // The talon only receives control packets every 10ms.
+	double kUpdatePeriod = 0.010;
+
+public:
+ Robot()
+     : m_motor(13),   // Initialize the Talon as device 1. Use the roboRIO web
+                    // interface to change the device number on the talons.
+       m_stick(0)
+ {
+	 //uncomment to perform PID on the CANTalon
+	 // m_motor.SetControlMode(CANSpeedController::kPosition);
+	 //
+	 //uncomment to use the CANTalon as a feedback device (absolute encoder configuration)
+	 m_motor.SetFeedbackDevice(CANTalon::CtreMagEncoder_Absolute);
+	 //
+	 //uncomment to invert the direction of the encoder to match the motor direction
+	 //m_motor.SetSensorDirection(true);
+	 m_motor.ConfigNominalOutputVoltage(+0,-0);
+	 m_motor.ConfigPeakOutputVoltage(+12,-12);
+	 m_motor.SetAllowableClosedLoopErr(103); //103 =4096*.025
+ }
+
+	/**
+	 * Runs the motor from the output of a Joystick.
+	 */
+	void OperatorControl() {
+		while (IsOperatorControl() && IsEnabled()) {
+      // Takes a number from -1.0 (full reverse) to +1.0 (full forwards).
+			m_motor.Set(0.1);
+			//std::cout << m_motor.GetPulseWidthPosition() << std::endl;
+			CANTalon::FeedbackDeviceStatus sensorStatus = m_motor.IsSensorPresent(CANTalon::CtreMagEncoder_Absolute);
+			bool sensorPluggedIn = (CANTalon::FeedbackStatusPresent == sensorStatus);
+			if(sensorPluggedIn)
+				std::cout << "True" << std::endl;
+			else
+				std::cout << "False" << std::endl;
+			std::cout<< "EncPosition"<< m_motor.GetPulseWidthPosition()<<std::endl;
+
+			//Wait(kUpdatePeriod); // Wait a bit so that the loop doesn't lock everything up.
+		}
+	}
+};
+
+START_ROBOT_CLASS(Robot)
