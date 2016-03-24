@@ -8,7 +8,6 @@
 
 //pwm channels
 #if robotConfig == robot2016
-
 #define leftSideMotorsCh 1
 #define rightSideMotorsCh 0
 #elif robotConfig == robot2015
@@ -40,13 +39,6 @@
 #define armMotorId 10
 #endif
 
-//analog channels
-#if robotConfig == robot2016
-#define potCh 0
-#elif robotConfig == robot2015
-#define potCh 0
-#endif
-
 //usb channels
 #define driveJsCh 0
 #define driveWheelCh 1
@@ -67,6 +59,13 @@
 #define rollerStopSpeed 0.0
 #define rollerOutSpeed -1.0
 
+//photoswitch settings
+#if robotConfig == robot2016
+#define photoSwitchBeamBroken false //state when the beam is broken
+#elif robotConfig == robot2015
+#define photoSwitchBeamBroken true
+#endif
+
 //Arm invert state
 #if robotConfig == robot2016
 #define rollerInvState -1.0  // -1 to invert; 1 to not invert
@@ -74,56 +73,36 @@
 #define rollerInvState -1.0
 #endif
 
-//potentiometer set points (all in volts)
+//arm position set points (all in fractions of a full encoder rotation)
 #if robotConfig == robot2016
-<<<<<<< HEAD
-#define armFlatPosition -0.65
-#define armDownPosition armFlatPosition
+#define armDownPosition -0.65
 #define armUpPosition -0.54
+#define armPidDisablePosition -0.6 //point on the way down to disable the arm pid
 #elif robotConfig == robot2015
-#define armFlatPosition -1.65
-#define armDownPosition armFlatPosition
+#define armDownPosition -1.65
 #define armUpPosition -1.54
-=======
-#define armFlatPosition 1.11
-#define armDownPosition armFlatPosition
-#define armUpPosition 0.1
-#elif robotConfig == robot2015
-#define armFlatPosition 0.38
-#define armDownPosition armFlatPosition
-#define armUpPosition 1.45
->>>>>>> origin/2016_Robot_ManualArm
+#define armPidDisablePosition -1.6 //point on the way down to disable the arm pid
 #endif
 
-//potentiometer PID values
-#define potMinVolt 0.0
-#define potMaxVolt 5.0
-#define potTol 1.0 //percent
-//
+//arm position PID controller
+#define armPidMinNominal -0.0 //min and maxes are all in volts
+#define armPidMaxNominal +0.0
+#define armPidMinPeak -12.0
+#define armPidMaxPeak +12.0
+#define armPidAllowableErr 0.0 //same units are arm position set points
 #if robotConfig == robot2016
-<<<<<<< HEAD
-#define potP 1.0
-#define potIAuto 0.0
-#define potITeleop 0.0006
-#define potD 100.0
+#define armPidP 1.0
+#define armPidIAuto 0.0
+#define armPidITeleop 0.0006
+#define armPidD 100.0
+#define armPidInvert true //true to invert, false not to invert
 #elif robotConfig == robot2015
-#define potP 1.0
-#define potIAuto 0.0
-#define potITeleop 0.0006
-#define potD 100.0
-=======
-#define potP -0.4
-#define potIAuto 0.0
-#define potITeleop -0.01
-#define potD 0.0
-#elif robotConfig == robot2015
-#define potP -0.2
-#define potIAuto 0.0
-#define potITeleop -0.005
-#define potD 0.0
->>>>>>> origin/2016_Robot_ManualArm
+#define armPidP 1.0
+#define armPidIAuto 0.0
+#define armPidITeleop 0.0006
+#define armPidD 100.0
+#define armPidInvert true //true to invert, false not to invert
 #endif
-
 
 //drive parameters
 #define driveEncoderCounts 1024.0
@@ -142,16 +121,10 @@
 #define rightEncInv true
 #endif
 
-//camera system parameters
-#define camViewAngle 49.0
-#define vTargetWidth 20
-#define fovPixWidth 320
-#define fovPixHeight 240
-
 //autonomous parameters
 #define autoDistance 15.0 //in feet
 #if robotConfig == robot2016
-#define autoLeftSpeed 0.82 //normalized speed from -1 to 1
+#define autoLeftSpeed 0.8 //normalized speed from -1 to 1
 #define autoRightSpeed 0.9
 #define autoSpeedInvert -1.0 // -1 to invert; 1 to not invert
 #elif robotConfig == robot2015
@@ -161,4 +134,3 @@
 #endif
 
 #endif /* _PARAMETERS_H_ */
-
